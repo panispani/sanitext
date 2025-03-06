@@ -2,6 +2,7 @@ import pytest
 import unicodedata
 from sanitext.text_sanitization import (
     detect_unicode_anomalies,
+    detect_suspicious_characters,
     normalize_to_standard,
     HOMOGLYPH_MAP,
     INVISIBLE_CHARACTERS,
@@ -43,7 +44,57 @@ from sanitext.text_sanitization import (
     ],
 )
 def test_detect_unicode_anomalies(text, expected):
-    assert detect_unicode_anomalies(text) == expected, f"Failed text: {text}"
+    detected_characters = detect_unicode_anomalies(text)
+    assert detected_characters == expected, (
+        f"Failed text: {text}, "
+        f"Found: {detected_characters}, "
+        f"Expected: {expected}"
+    )
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        ("Hello, world! 👋", [("👋", "WAVING HAND SIGN")]),
+        (
+            "Thіs tеxt cоntaіns homoglyphs.",  # Uses homoglyphs
+            [
+                ("і", "CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I"),
+                ("е", "CYRILLIC SMALL LETTER IE"),
+                ("о", "CYRILLIC SMALL LETTER O"),
+                ("і", "CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I"),
+            ],
+        ),
+        ("Normal ASCII text.", []),  # No anomalies
+        ("Invisible​ character.", [("​", "ZERO WIDTH SPACE")]),  # Invisible character
+        (
+            "𝑇ℎ𝑖𝑠.",  # Unicode math characters
+            [
+                ("𝑇", "MATHEMATICAL ITALIC CAPITAL T"),
+                ("ℎ", "PLANCK CONSTANT"),
+                ("𝑖", "MATHEMATICAL ITALIC SMALL I"),
+                ("𝑠", "MATHEMATICAL ITALIC SMALL S"),
+            ],
+        ),
+        ("​", [("​", "ZERO WIDTH SPACE")]),  # Just an invisible character
+        (
+            "​ ​",  # Multiple invisible characters
+            [
+                ("​", "ZERO WIDTH SPACE"),
+                (" ", "NARROW NO-BREAK SPACE"),
+                ("​", "ZERO WIDTH SPACE"),
+            ],
+        ),
+        ("", []),  # Empty string
+    ],
+)
+def test_detect_suspicious_characters(text, expected):
+    detected_characters = detect_suspicious_characters(text)
+    assert detected_characters == expected, (
+        f"Failed text: {text}, "
+        f"Found: {detected_characters}, "
+        f"Expected: {expected}"
+    )
 
 
 @pytest.mark.parametrize(
