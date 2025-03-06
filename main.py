@@ -1,3 +1,8 @@
+import pyperclip
+import typer
+
+app = typer.Typer()
+
 import unicodedata
 import re
 
@@ -70,17 +75,56 @@ def normalize_to_standard(text):
     return unicodedata.normalize("NFKC", text)
 
 
-if __name__ == "__main__":
-    sample_text = "Thіs tеxt cоntaіns homoglyphs and invіsiblе characters.​"
-    ascii_text = "This text contains homoglyphs and invisible characters."  # this is actually ascii
-    anomalies = detect_unicode_anomalies(sample_text)
-    print("Detected Anomalies:", anomalies)
+# Test
+#     sample_text = "Thіs tеxt cоntaіns homoglyphs and invіsiblе characters.​"
+#     ascii_text = "This text contains homoglyphs and invisible characters."  # this is actually ascii
 
-    cleaned_text = normalize_to_standard(sample_text)
-    print(
-        "Cleaned Text:",
-        cleaned_text,
-        ascii_text == cleaned_text,
-        # unicode normalization is not enough
-        ascii_text == unicodedata.normalize("NFKC", sample_text),
-    )
+# CLI design
+# mytool --detect         # Detect characters only
+# mytool --string         # Process the string and print it
+# mytool                  # Process the clipboard string, copy to clipboard, print if unchanged
+# mytool --verbose        # Process + show detected info
+
+
+@app.command()
+def main(
+    detect: bool = typer.Option(
+        False, "--detect", "-d", help="Detect characters only."
+    ),
+    text: bool = typer.Option(
+        False, "--string", "-s", help="Provide the processed string."
+    ),
+    verbose: bool = typer.Option(
+        False, "--verbose", "-v", help="Verbose mode (show detected info)."
+    ),
+):
+    """Processes text from the clipboard or prints processed text."""
+
+    if not text:
+        text = pyperclip.paste()
+        if not text:
+            typer.echo("Clipboard is empty and no string was provided!", err=True)
+            raise typer.Exit(1)
+
+    if detect:
+        detected_info = detect_unicode_anomalies(text)
+        typer.echo(f"Detected: {detected_info}")
+        raise typer.Exit(0)
+
+    if verbose:
+        detected_info = detect_unicode_anomalies(text)
+        typer.echo(f"Input: {text}")
+        typer.echo(f"Detected: {detected_info}")
+
+    processed_text = normalize_to_standard(text)
+    text_log = ("\nOutput:\n" + processed_text) if verbose else ""
+
+    if processed_text != text:
+        pyperclip.copy(processed_text)
+        typer.echo("Processed and copied to clipboard." + text_log)
+    else:
+        typer.echo("No changes!" + text_log)
+
+
+if __name__ == "__main__":
+    app()
