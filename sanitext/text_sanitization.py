@@ -1,8 +1,3 @@
-# Test
-#     sample_text = "Thіs tеxt cоntaіns homoglyphs and invіsiblе characters.​"
-#     ascii_text = "This text contains homoglyphs and invisible characters."  # this is actually ascii
-
-
 import unicodedata
 import re
 

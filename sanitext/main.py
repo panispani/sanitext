@@ -1,15 +1,19 @@
+"""
+sanitext: A command-line tool and python library for text sanitization.
+
+Usage examples:
+  - mytool --detect         # Detect characters only
+  - mytool --string "text"  # Process the provided string and print it
+  - mytool                  # Process the clipboard string, copy to clipboard, print if unchanged
+  - mytool --verbose        # Process + show detected info
+"""
+
 import pyperclip
 import typer
 
 from .text_sanitization import detect_unicode_anomalies, normalize_to_standard
 
 app = typer.Typer()
-
-# CLI design
-# mytool --detect         # Detect characters only
-# mytool --string         # Process the string and print it
-# mytool                  # Process the clipboard string, copy to clipboard, print if unchanged
-# mytool --verbose        # Process + show detected info
 
 
 @app.command()
@@ -18,10 +22,10 @@ def main(
         False, "--detect", "-d", help="Detect characters only."
     ),
     string: str = typer.Option(
-        None, "--string", "-s", help="Provide the processed string."
+        None, "--string", "-s", help="Process the provided string and print it."
     ),
     verbose: bool = typer.Option(
-        False, "--verbose", "-v", help="Verbose mode (show detected info)."
+        False, "--verbose", "-v", help="Verbose mode (process and show detected info)."
     ),
 ):
     # Get text from either CLI or clipboard
