@@ -11,7 +11,7 @@ Usage examples:
 import pyperclip
 import typer
 
-from .text_sanitization import detect_unicode_anomalies, normalize_to_standard
+from sanitext.text_sanitization import detect_unicode_anomalies, normalize_to_standard
 
 app = typer.Typer()
 
