@@ -1,11 +1,26 @@
 """
-sanitext: A command-line tool and python library for text sanitization.
+sanitext: A command-line tool and Python library for text sanitization.
+
+Features:
+  - Detect suspicious characters in text.
+  - Sanitize text by removing or replacing non-allowed characters.
+  - Customizable character filtering:
+      - By default, only allows ASCII printable characters.
+      - Optionally allow Unicode characters (--allow-unicode).
+      - Specify additional allowed characters (--allow-chars).
+      - Load a file containing allowed characters (--allow-file).
+  - Interactive mode (--interactive):
+      - Manually decide what to do with disallowed characters (keep, remove, replace).
 
 Usage examples:
-  - mytool --detect         # Detect characters only
-  - mytool --string "text"  # Process the provided string and print it
-  - mytool                  # Process the clipboard string, copy to clipboard, print if unchanged
-  - mytool --verbose        # Process + show detected info
+  - sanitext --detect          # Detect characters only
+  - sanitext --string "text"   # Process the provided string and print it
+  - sanitext                   # Process the clipboard string, copy to clipboard, print if unchanged
+  - sanitext --verbose         # Process + show detected info
+  - sanitext --allow-unicode   # Allow Unicode characters (use with caution..) TODO does this even work
+  - sanitext --allow-chars "αβñç"  # Allow additional characters
+  - sanitext --allow-file allowed_chars.txt  # Allow characters from a file
+  - sanitext --interactive    # Prompt user for handling disallowed characters
 """
 
 import pyperclip
