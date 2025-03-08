@@ -18,15 +18,23 @@ Usage examples:
   - sanitext                   # Process the clipboard string, copy to clipboard, print if unchanged
   - sanitext --verbose         # Process + show detected info
   - sanitext --allow-unicode   # Allow Unicode characters (use with caution..) TODO does this even work
-  - sanitext --allow-chars "αβñç"  # Allow additional characters
+  - sanitext --allow-chars "αñøç"  # Allow additional characters
   - sanitext --allow-file allowed_chars.txt  # Allow characters from a file
   - sanitext --interactive    # Prompt user for handling disallowed characters
 """
 
 import pyperclip
 import typer
+import unicodedata
+import sys
+from pathlib import Path
 
-from sanitext.text_sanitization import detect_unicode_anomalies, normalize_to_standard
+from sanitext.text_sanitization import (
+    detect_suspicious_characters,
+    sanitize_text,
+    get_allowed_characters,
+)
+
 
 app = typer.Typer()
 
@@ -40,7 +48,30 @@ def main(
         None, "--string", "-s", help="Process the provided string and print it."
     ),
     verbose: bool = typer.Option(
-        False, "--verbose", "-v", help="Verbose mode (process and show detected info)."
+        False, "--verbose", "-v", help="Verbose mode (process + show detected info)."
+    ),
+    allow_unicode: bool = typer.Option(
+        False, "--allow-unicode", help="Allow Unicode characters."
+    ),
+    allow_chars: str = typer.Option(
+        None,
+        "--allow-chars",
+        help='Additional characters to allow, e.g. --allow-chars "αñøç"',
+    ),
+    allow_file: Path = typer.Option(
+        None,
+        "--allow-file",
+        help="Path to a file containing characters to allow (one big string or multiple lines).",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+    ),
+    interactive: bool = typer.Option(
+        False,
+        "--interactive",
+        "-i",
+        help="Interactive prompt for disallowed characters.",
     ),
 ):
     # Get text from either CLI or clipboard
@@ -52,16 +83,31 @@ def main(
         )
         raise typer.Exit(1)
 
-    # Detection-only mode
+    allowed_characters = get_allowed_characters(
+        allow_unicode=allow_unicode,
+        allow_chars=allow_chars,
+        allow_file=allow_file,
+    )
+
+    # If detection-only, just do detection and exit
     if detect:
-        detected_info = detect_unicode_anomalies(text)
+        detected_info = detect_suspicious_characters(
+            text, allowed_characters=allowed_characters
+        )
         typer.echo(f"Detected: {detected_info}")
         raise typer.Exit(0)
 
-    processed_text = normalize_to_standard(text)
+    # Otherwise, sanitize
+    processed_text = sanitize_text(
+        text,
+        allowed_characters=allowed_characters,
+        interactive=interactive,
+    )
 
     if verbose:
-        detected_info = detect_unicode_anomalies(text)
+        detected_info = detect_suspicious_characters(
+            text, allowed_characters=allowed_characters
+        )
         typer.echo(f"Input: {text}")
         typer.echo(f"Detected: {detected_info}")
         typer.echo(f"Output: {processed_text}")
