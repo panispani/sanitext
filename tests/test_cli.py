@@ -31,6 +31,14 @@ def test_cli_process():
 def test_cli_verbose():
     """Test verbose mode output."""
     result = runner.invoke(app, ["--verbose", "-s", "Thіs іs а test."])
+    assert "Detected:" in result.output
+    assert "Output: This is a test." not in result.output
+    assert result.exit_code == 0
+
+
+def test_cli_very_verbose():
+    """Test very verbose mode output."""
+    result = runner.invoke(app, ["--very-verbose", "-s", "Thіs іs а test."])
     assert "Input: Thіs іs а test." in result.output
     assert "Detected:" in result.output
     assert "Output: This is a test." in result.output
@@ -201,7 +209,7 @@ def test_cli_interactive_remove_replace(monkeypatch):
     monkeypatch.setattr("builtins.input", mock_input)
     monkeypatch.setattr(pyperclip, "paste", lambda: text)
 
-    result = runner.invoke(app, ["--interactive", "-v"])
+    result = runner.invoke(app, ["--interactive", "-vv"])
 
     # We expect: "Café" => "Caf" because 'é' was removed,
     # Then " ☯" => " ?" because '☯' was replaced with '?'

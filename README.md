@@ -26,8 +26,10 @@ sanitext
 sanitext --detect
 # Process the provided string and print it
 sanitext --string "Héllø, 𝒲𝑜𝓇𝓁𝒹!"
-# Process + show detected info
+# Process + show detected info, also -v
 sanitext --verbose
+# Process + show detected info + show input/output, also --very-verbose
+sanitext -vv
 # Allow Unicode characters (use with caution)
 sanitext --allow-unicode
 # Allow additional characters

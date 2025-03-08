@@ -17,6 +17,7 @@ Usage examples:
   - sanitext --string "text"   # Process the provided string and print it
   - sanitext                   # Process the clipboard string, copy to clipboard, print if unchanged
   - sanitext --verbose         # Process + show detected info
+  - sanitext --very-verbose    # Process + show input, detected info, and output
   - sanitext --allow-unicode   # Allow Unicode characters (use with caution..) TODO does this even work
   - sanitext --allow-chars "αñøç"  # Allow additional characters
   - sanitext --allow-file allowed_chars.txt  # Allow characters from a file
@@ -49,6 +50,12 @@ def main(
     ),
     verbose: bool = typer.Option(
         False, "--verbose", "-v", help="Verbose mode (process + show detected info)."
+    ),
+    very_verbose: bool = typer.Option(
+        False,
+        "--very-verbose",
+        "-vv",
+        help="Very verbose mode (process + show input, detected info, and output).",
     ),
     allow_unicode: bool = typer.Option(
         False, "--allow-unicode", help="Allow Unicode characters."
@@ -104,13 +111,18 @@ def main(
         interactive=interactive,
     )
 
-    if verbose:
+    if very_verbose:
         detected_info = detect_suspicious_characters(
             text, allowed_characters=allowed_characters
         )
         typer.echo(f"Input: {text}")
         typer.echo(f"Detected: {detected_info}")
         typer.echo(f"Output: {processed_text}")
+    elif verbose:
+        detected_info = detect_suspicious_characters(
+            text, allowed_characters=allowed_characters
+        )
+        typer.echo(f"Detected: {detected_info}")
 
     # If no `--string`, copy back to clipboard
     if string is None:
