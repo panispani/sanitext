@@ -2,7 +2,7 @@
 
 **Sanitize text from LLMs**
 
-Sanitext is a command-line tool and Python library for detecting and removing unwanted characters in text. It supports:
+Sanitext is a **command-line tool** and **Python library** for detecting and removing unwanted characters in text. It supports:
 
 - ASCII-only sanitization (default)
 - Unicode support (`--allow-unicode`)
@@ -17,7 +17,7 @@ pip install sanitext
 
 By default, sanitext uses the string in your clipboard unless you specify one with `--string`.
 
-Usage examples:
+## CLI usage example
 
 ```bash
 # Process the clipboard string, copy to clipboard, print if unchanged
@@ -41,6 +41,31 @@ sanitext --allow-file allowed_chars.txt
 sanitext --interactive
 ```
 
+## Python library usage example
+
+```python
+from sanitext.text_sanitization import (
+    sanitize_text,
+    detect_suspicious_characters,
+    get_allowed_characters,
+)
+
+text = "“2×3 – 4 = 5”"
+
+# Detect suspicious characters
+suspicious_characters = detect_suspicious_characters(text)
+# [('“', 'LEFT DOUBLE QUOTATION MARK'), ('×', 'MULTIPLICATION SIGN'), ('–', 'EN DASH'), ('”', 'RIGHT DOUBLE QUOTATION MARK')]
+print(f"Suspicious characters: {suspicious_characters}")
+
+# Sanitize text
+sanitized_text = sanitize_text(text)
+print(f"Sanitized text: {sanitized_text}")
+allowed_characters = get_allowed_characters()
+allowed_characters.add("×") # Allow the multiplication sign
+sanitized_text = sanitize_text(text, allowed_characters=allowed_characters)
+print(f"Sanitized text: {sanitized_text}")
+```
+
 ## Dev setup
 
 ```bash
@@ -48,7 +73,7 @@ sanitext --interactive
 poetry install
 # Use it
 poetry run python sanitext/cli.py --help
-poetry run python sanitext/cli.py --string ok
+poetry run python sanitext/cli.py --string "your string"
 # Run tests
 poetry run pytest
 poetry run pytest -s tests/test_cli.py
