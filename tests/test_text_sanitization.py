@@ -187,6 +187,53 @@ def test_detect_suspicious_characters_empty(ascii_allowed):
     assert suspicious == [], "Empty text should yield no suspicious characters."
 
 
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        ("Hello, world! 👋", [("👋", "WAVING HAND SIGN")]),
+        (
+            "Thіs tеxt cоntaіns homoglyphs.",  # Uses homoglyphs
+            [
+                ("і", "CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I"),
+                ("е", "CYRILLIC SMALL LETTER IE"),
+                ("о", "CYRILLIC SMALL LETTER O"),
+                ("і", "CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I"),
+            ],
+        ),
+        ("Normal ASCII text.", []),  # No anomalies
+        ("Invisible​ character.", [("​", "ZERO WIDTH SPACE")]),  # Invisible character
+        (
+            "𝑇ℎ𝑖𝑠.",  # Unicode math characters
+            [
+                ("𝑇", "MATHEMATICAL ITALIC CAPITAL T"),
+                ("ℎ", "PLANCK CONSTANT"),
+                ("𝑖", "MATHEMATICAL ITALIC SMALL I"),
+                ("𝑠", "MATHEMATICAL ITALIC SMALL S"),
+            ],
+        ),
+        ("​", [("​", "ZERO WIDTH SPACE")]),  # Just an invisible character
+        (
+            "​ ​",  # Multiple invisible characters
+            [
+                ("​", "ZERO WIDTH SPACE"),
+                (" ", "NARROW NO-BREAK SPACE"),
+                ("​", "ZERO WIDTH SPACE"),
+            ],
+        ),
+        ("", []),  # Empty string
+    ],
+)
+def test_detect_suspicious_characters_parametrized(text, expected):
+    detected_characters = detect_suspicious_characters(
+        text, allowed_characters=get_allowed_characters()
+    )
+    assert detected_characters == expected, (
+        f"Failed text: {text}, "
+        f"Found: {detected_characters}, "
+        f"Expected: {expected}"
+    )
+
+
 # -------------------------------------------------------------------
 # Tests for sanitize_text (non-interactive)
 # -------------------------------------------------------------------
@@ -196,14 +243,31 @@ def test_detect_suspicious_characters_empty(ascii_allowed):
 @pytest.mark.parametrize(
     "text, expected",
     [
-        # 1) No disallowed => Should remain the same
+        # No disallowed => Should remain the same
         ("Hello, world!\n", "Hello, world!\n"),
-        # 2) Contains a decomposable char => e.g., "é"
+        # Contains a decomposable char => e.g., "é"
         ("Café", "Cafe"),
-        # 3) Contains a symbol that can't be decomposed => e.g., "☯"
+        # Contains a symbol that can't be decomposed => e.g., "☯"
         ("Peace ☯ within", "Peace  within"),  # '☯' replaced with ""
-        # 4) Mixed example => "Ⅵ is VI" => "VI is VI"
+        # Mixed example => "Ⅵ is VI" => "VI is VI"
         ("Ⅵ is VI", "VI is VI"),
+        # Homoglyphs
+        (
+            "Thіs tеxt cоntaіns homoglyphs.",
+            "This text contains homoglyphs.",
+        ),
+        # No changes
+        ("Normal ASCII text.", "Normal ASCII text."),
+        # Remove invisible character
+        ("Invisible​ character.", "Invisible character."),
+        # Convert math bold
+        ("𝑇ℎ𝑖𝑠 𝑡𝑒𝑥𝑡 𝑢𝑠𝑒𝑠 𝑚𝑎𝑡ℎ 𝑏𝑜𝑙𝑑.", "This text uses math bold."),
+        # Remove multiple invisible characters
+        ("​ ​", " "),
+        # Remove standalone invisible character
+        ("​", ""),
+        # Empty input should remain empty
+        ("", ""),
     ],
 )
 def test_sanitize_text_default(text, expected, ascii_allowed):
