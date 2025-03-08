@@ -2,6 +2,7 @@ import unicodedata
 import re
 import string
 import sys
+from sanitext.homoglyph_map import get_homoglyph_replacement
 
 
 def get_allowed_characters(allow_unicode=False, allow_chars=None, allow_file=None):
@@ -76,7 +77,7 @@ def sanitize_text(text, allowed_characters=get_allowed_characters(), interactive
                     print("Invalid input. Please enter 'y', 'n', or 'r'.")
     else:
         for ch in disallowed_chars:
-            closest = closest_ascii(ch, allowed_characters)
+            closest = closest_ascii(ch, allowed_characters)  # what if unicode enabled
             char_decisions[ch] = (
                 closest if set(closest).issubset(allowed_characters) else ""
             )
@@ -94,7 +95,12 @@ def sanitize_text(text, allowed_characters=get_allowed_characters(), interactive
 
 def closest_ascii(char, allowed_characters):
     """Returns the closest ASCII character for a given Unicode character."""
-    # Try Unicode normalization (NFKC) first
+    # Try homoglyph replacement first
+    mapped = get_homoglyph_replacement(char)
+    if mapped in allowed_characters:
+        return mapped  # Direct replacement
+
+    # Try Unicode normalization (NFKC)
     normalized = unicodedata.normalize("NFKC", char)
     if all(c in allowed_characters for c in normalized):
         return normalized  # Safe replacement
@@ -122,7 +128,7 @@ def closest_ascii(char, allowed_characters):
     return ""
 
 
-def detect_suspicious_characters(text, alowed_characters=get_allowed_characters()):
+def detect_suspicious_characters(text, allowed_characters=get_allowed_characters()):
     """
     Finds characters in the text that are not ASCII letters, digits, punctuation, or common whitespace.
 
@@ -136,5 +142,5 @@ def detect_suspicious_characters(text, alowed_characters=get_allowed_characters(
     return [
         (char, unicodedata.name(char, "Unknown"))
         for char in text
-        if char not in alowed_characters
+        if char not in allowed_characters
     ]
