@@ -63,8 +63,6 @@ def sanitize_text(text, allowed_characters=get_allowed_characters(), interactive
                     if decision == "y":
                         # Keep => add to allowed set for this run
                         char_decisions[ch] = ch
-                        # Optionally, you might want to permanently
-                        # add to allowed = allowed.union({ch}) TODO
                     elif decision == "n":
                         # Remove => map to empty string
                         char_decisions[ch] = ""

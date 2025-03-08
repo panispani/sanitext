@@ -239,7 +239,7 @@ def test_detect_suspicious_characters_parametrized(text, expected):
 # -------------------------------------------------------------------
 
 
-# TODO: how do i run only one of them
+# TODO: how to run only one of these easily
 @pytest.mark.parametrize(
     "text, expected",
     [

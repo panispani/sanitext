@@ -1,5 +1,7 @@
 # A comprehensive mapping of Unicode homoglyphs to ASCII characters
 
+# TODO: this should be
+#   chr(0xc0): "A", # "À"
 HOMOGLYPH_MAP = {
     # Latin Homoglyphs
     "À": "A",
@@ -230,15 +232,41 @@ HOMOGLYPH_MAP = {
     "©": "(c)",
     "®": "(R)",
     "™": "(TM)",
-    # Invinsible
+    # Whitespace
     " ": " ",
     " ": " ",
-    "​": "",
     " ": " ",
     " ": " ",
     " ": " ",
     "⠀": " ",
     "᠎": " ",
+    # Invinsible
+    chr(0x200B): "",
+    chr(0x200C): "",
+    chr(0x200D): "",
+    chr(0x200E): "",
+    chr(0x200F): "",
+    chr(0xFEFF): "",
+    chr(0x202A): "",
+    chr(0x202B): "",
+    chr(0x202C): "",
+    chr(0x202D): "",
+    chr(0x202E): "",
+    chr(0x2060): "",
+    chr(0x2061): "",
+    chr(0x2062): "",
+    chr(0x2063): "",
+    chr(0x2064): "",
+    chr(0x2066): "",
+    chr(0x2067): "",
+    chr(0x2068): "",
+    chr(0x2069): "",
+    chr(0x206A): "",
+    chr(0x206B): "",
+    chr(0x206C): "",
+    chr(0x206D): "",
+    chr(0x206E): "",
+    chr(0x206F): "",
 }
 
 
