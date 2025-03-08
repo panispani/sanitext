@@ -36,7 +36,7 @@ def sanitize_text(text, allowed_characters=get_allowed_characters(), interactive
     Returns the sanitized text.
     """
     # Identify disallowed characters
-    disallowed_chars = set(ch for ch in text if ch not in allowed_characters)
+    disallowed_chars = sorted(set(ch for ch in text if ch not in allowed_characters))
     if not disallowed_chars:
         # If nothing disallowed, just return original text
         return text

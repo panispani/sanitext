@@ -255,3 +255,36 @@ def test_sanitize_text_all_disallowed():
     assert (
         sanitized == ""
     ), f"With a minimal allowed set, everything gets removed or replaced with ''. Got: {sanitized}"
+
+
+# -------------------------------------------------------------------
+# Testing interactive mode by mocking input
+# -------------------------------------------------------------------
+def test_sanitize_text_interactive(monkeypatch, ascii_allowed):
+    """
+    Example: mock user input for interactive decisions:
+      - first disallowed char => Keep
+      - second disallowed char => Remove
+      - third disallowed char => Replace (with '?')
+    """
+    # We'll contrive a text with exactly three distinct disallowed characters: é, ☯, and ø
+    text = "Hello é, ø, and ☯!"
+
+    # A queue of user responses:
+    # 1) 'y' => keep 'é'
+    # 2) 'n' => remove 'ø'
+    # 3) 'r' => replace '☯' with '?'
+    inputs = iter(["y", "n", "r", "?"])
+
+    def fake_input(prompt):
+        return next(inputs)
+
+    # Use monkeypatch to replace 'input'
+    monkeypatch.setattr("builtins.input", fake_input)
+
+    print(detect_suspicious_characters(text, alowed_characters=ascii_allowed))
+
+    sanitized = sanitize_text(text, allowed_characters=ascii_allowed, interactive=True)
+    # We expect: "Hello é, , and ?!"
+    # Because 'é' was kept, 'ø' was removed, '☯' was replaced with '?'
+    assert sanitized == "Hello é, , and ?!"
