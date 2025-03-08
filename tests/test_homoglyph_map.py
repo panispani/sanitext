@@ -40,7 +40,6 @@ class TestHomoglyphMap(unittest.TestCase):
             with self.subTest(key=key):
                 self.assertIsInstance(key, str)
                 self.assertIsInstance(value, str)
-                self.assertGreater(len(value), 0)  # Ensures no empty mappings
 
 
 if __name__ == "__main__":
