@@ -45,6 +45,9 @@ def sanitize_text(text, allowed_characters=get_allowed_characters(), interactive
     char_decisions = {}
     if interactive:
         for ch in disallowed_chars:
+            # Decision for this character already been taken
+            if ch in char_decisions:
+                continue
             # Provide some info about the character
             char_info = f"'{ch}' (U+{ord(ch):04X}, {unicodedata.name(ch, 'Unknown')})"
             while True:

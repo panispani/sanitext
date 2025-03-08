@@ -258,14 +258,14 @@ def test_sanitize_text_all_disallowed():
 
 
 # -------------------------------------------------------------------
-# Testing interactive mode by mocking input
+# Testing interactive mode
 # -------------------------------------------------------------------
 def test_sanitize_text_interactive(monkeypatch, ascii_allowed):
     """
-    Example: mock user input for interactive decisions:
-      - first disallowed char => Keep
-      - second disallowed char => Remove
-      - third disallowed char => Replace (with '?')
+    Mock user input for interactive decisions:
+        - keep 'é'
+        - remove 'ø'
+        - replace '☯' with '?'
     """
     # We'll contrive a text with exactly three distinct disallowed characters: é, ☯, and ø
     text = "Hello é, ø, and ☯!"
@@ -282,9 +282,32 @@ def test_sanitize_text_interactive(monkeypatch, ascii_allowed):
     # Use monkeypatch to replace 'input'
     monkeypatch.setattr("builtins.input", fake_input)
 
-    print(detect_suspicious_characters(text, alowed_characters=ascii_allowed))
-
     sanitized = sanitize_text(text, allowed_characters=ascii_allowed, interactive=True)
     # We expect: "Hello é, , and ?!"
     # Because 'é' was kept, 'ø' was removed, '☯' was replaced with '?'
     assert sanitized == "Hello é, , and ?!"
+
+
+def test_sanitize_text_interactive_repeated_characters(monkeypatch, ascii_allowed):
+    """
+    Mock user input for interactive decisions:
+      - é => Replace with "!"
+      No need to ask again, even though é appears 3 times because its fate
+      has been decided
+    """
+    # We'll contrive a text with exactly three distinct disallowed characters: é, ☯, and ø
+    text = "Hello é, é, and é!"
+
+    # 'y' => replace 'é' with '!'
+    inputs = iter(["r", "!"])
+
+    def fake_input(prompt):
+        return next(inputs)
+
+    # Use monkeypatch to replace 'input'
+    monkeypatch.setattr("builtins.input", fake_input)
+
+    sanitized = sanitize_text(text, allowed_characters=ascii_allowed, interactive=True)
+    # We expect: "Hello !, !, and !!"
+    # Because all 'é' were replaced with '!'
+    assert sanitized == "Hello !, !, and !!"
