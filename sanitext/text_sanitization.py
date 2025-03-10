@@ -5,15 +5,15 @@ import sys
 from sanitext.homoglyph_map import get_homoglyph_replacement
 
 
-def get_allowed_characters(allow_unicode=False, allow_chars=None, allow_file=None):
+def get_allowed_characters(allow_unicode_bmp=False, allow_chars=None, allow_file=None):
     """
     Build and return the set of allowed characters based on:
       - default ASCII printable
-      - user-specified flag to allow all unicode
+      - user-specified flag to allow all bmp unicode
       - user-specified chars
       - user-specified file
     """
-    if allow_unicode:
+    if allow_unicode_bmp:
         # Entire range of Basic Multilingual Plane
         allowed = set(chr(i) for i in range(sys.maxunicode + 1))
     else:
@@ -75,7 +75,7 @@ def sanitize_text(text, allowed_characters=get_allowed_characters(), interactive
                     print("Invalid input. Please enter 'y', 'n', or 'r'.")
     else:
         for ch in disallowed_chars:
-            closest = closest_ascii(ch, allowed_characters)  # what if unicode enabled
+            closest = closest_ascii(ch, allowed_characters)
             char_decisions[ch] = (
                 closest if set(closest).issubset(allowed_characters) else ""
             )

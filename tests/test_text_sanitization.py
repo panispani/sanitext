@@ -25,7 +25,7 @@ def all_unicode_allowed():
     """
     A fixture that returns a set of all Unicode characters.
     """
-    return get_allowed_characters(allow_unicode=True)
+    return get_allowed_characters(allow_unicode_bmp=True)
 
 
 # -------------------------------------------------------------------
@@ -47,7 +47,7 @@ def test_get_allowed_characters_default(ascii_allowed):
 
 def test_get_allowed_characters_all_unicode(all_unicode_allowed):
     """
-    If allow_unicode=True, the allowed set should contain Basic Multilingual Plane.
+    If allow_unicode_bmp=True, the allowed set should contain Basic Multilingual Plane.
     """
     # Check that typical ASCII chars are included
     for ch in "ABC123!@# \t\n\r":

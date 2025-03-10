@@ -5,7 +5,7 @@
 Sanitext is a **command-line tool** and **Python library** for detecting and removing unwanted characters in text. It supports:
 
 - ASCII-only sanitization (default)
-- Unicode support (`--allow-unicode`)
+- Unicode support (Basic Multilingual Plane) (`--allow-unicode-bmp`)
 - Custom character allowlists (`--allow-chars`, `--allow-file`)
 - Interactive review of non-allowed characters (`--interactive`)
 
@@ -30,8 +30,8 @@ sanitext --string "Héllø, 𝒲𝑜𝓇𝓁𝒹!"
 sanitext --verbose
 # Process + show detected info + show input/output, also --very-verbose
 sanitext -vv
-# Allow Unicode characters (use with caution)
-sanitext --allow-unicode
+# Allow Unicode characters (Basic Multilingual Plane, use with caution, it allows many homoglyphs)
+sanitext --allow-unicode-bmp
 # Allow additional characters
 sanitext --allow-chars "αøñç"
 # Allow characters from a file
