@@ -59,6 +59,11 @@ def main(
         "--allow-chars",
         help='Additional characters to allow, e.g. --allow-chars "αñøç"',
     ),
+    allow_emoji: bool = typer.Option(
+        False,
+        "--allow-emoji",
+        help='Allow single code point emoji"',  # TODO: extend to multiple codepoints
+    ),
     allow_file: Path = typer.Option(
         None,
         "--allow-file",
@@ -87,6 +92,7 @@ def main(
     allowed_characters = get_allowed_characters(
         allow_chars=allow_chars,
         allow_file=allow_file,
+        allow_emoji=allow_emoji,
     )
 
     # If detection-only, just do detection and exit

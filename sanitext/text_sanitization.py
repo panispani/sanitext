@@ -6,17 +6,17 @@ from sanitext.homoglyph_map import get_homoglyph_replacement
 from sanitext.emoji_set import EMOJI_SET
 
 
-def get_allowed_characters(allow_emojis=False, allow_chars=None, allow_file=None):
+def get_allowed_characters(allow_emoji=False, allow_chars=None, allow_file=None):
     """
     Build and return the set of allowed characters based on:
       - default ASCII printable
-      - user-specified flag to allow emojis
+      - user-specified flag to allow single code point emojis
       - user-specified chars
       - user-specified file (pathlib.Path object)
     """
     allowed = set(string.printable)
 
-    if allow_emojis:
+    if allow_emoji:
         allowed.update(EMOJI_SET)
 
     # If user provides extra chars via CLI:

@@ -23,7 +23,7 @@ def test_cli_detect():
 
 def test_cli_process():
     """Test processing and replacing text."""
-    result = runner.invoke(app, ["--string", "Thіs іs а test."])
+    result = runner.invoke(app, ["--string", "Thіs іs а test.🔥"])
     assert "This is a test." in result.output
     assert result.exit_code == 0
 
@@ -75,6 +75,18 @@ def test_cli_allow_chars():
     result = runner.invoke(app, ["--allow-chars", "ä", "-s", input_text])
     assert "Look, an umlaut: ä" in result.output
     # Without --allow-chars "ä", it would normally become "Look, an umlaut: a"
+    assert result.exit_code == 0
+
+
+def test_cli_allow_emoji():
+    """
+    Test allowing single code point emoji via --allow-emoji.
+    """
+    # '😎' is normally disallowed. If we allow it explicitly, it should pass through.
+    input_text = "Look, a boss 😎"
+    result = runner.invoke(app, ["--allow-emoji", "-s", input_text])
+    assert "Look, a boss 😎" in result.output
+    # Without --allow-emoji, it would normally become "Look, a boss "
     assert result.exit_code == 0
 
 
@@ -219,4 +231,5 @@ def test_cli_help():
     assert "--detect" in result.output
     assert "--interactive" in result.output
     assert "--allow-chars" in result.output
+    assert "--allow-emoji" in result.output
     assert "--allow-file" in result.output

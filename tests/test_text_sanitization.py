@@ -10,6 +10,7 @@ from sanitext.text_sanitization import (
     closest_ascii,
     detect_suspicious_characters,
 )
+from sanitext.emoji_set import EMOJI_SET
 
 
 @pytest.fixture
@@ -36,6 +37,9 @@ def test_get_allowed_characters_default(ascii_allowed):
     # Check that a typical non-ASCII char is excluded
     assert "é" not in ascii_allowed, "Default allowed set should NOT contain 'é'"
 
+    # Check that an emoji is excluded
+    assert "😀" not in ascii_allowed, "Default allowed set should NOT contain '😀'"
+
 
 def test_get_allowed_characters_custom_chars(ascii_allowed):
     """
@@ -50,6 +54,22 @@ def test_get_allowed_characters_custom_chars(ascii_allowed):
 
     # The extra characters should also be included
     for ch in extra_chars:
+        assert ch in custom_allowed, f"Custom allowed set should contain '{ch}'"
+
+
+def test_get_allowed_characters_emoji(ascii_allowed):
+    """
+    Adding support for single code point emoji via 'allow_emoji'.
+    """
+    custom_allowed = get_allowed_characters(allow_emoji=True)
+
+    # Everything in ascii_allowed should still be included
+    for ch in ascii_allowed:
+        assert ch in custom_allowed
+
+    # Emojis should also be included
+    assert "😀" in custom_allowed, f"Custom allowed set should contain '😀'"
+    for ch in EMOJI_SET:
         assert ch in custom_allowed, f"Custom allowed set should contain '{ch}'"
 
 
