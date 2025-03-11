@@ -66,19 +66,6 @@ def test_cli_no_clipboard(monkeypatch):
     assert result.exit_code == 1
 
 
-def test_cli_allow_unicode_bmp():
-    """
-    If --allow-unicode-bmp is used, we expect the text to remain untouched
-    even if it has unusual Unicode characters.
-    """
-    # A string with various non-ASCII characters
-    input_text = "Café ☯ Ⅷ 𝔗"
-    result = runner.invoke(app, ["--allow-unicode-bmp", "--string", input_text])
-    # Should be unchanged
-    assert input_text in result.output, "Expected the text to remain unchanged."
-    assert result.exit_code == 0
-
-
 def test_cli_allow_chars():
     """
     Test allowing extra characters manually via --allow-chars.

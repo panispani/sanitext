@@ -20,14 +20,6 @@ def ascii_allowed():
     return get_allowed_characters()
 
 
-@pytest.fixture
-def all_unicode_allowed():
-    """
-    A fixture that returns a set of all Unicode characters.
-    """
-    return get_allowed_characters(allow_unicode_bmp=True)
-
-
 # -------------------------------------------------------------------
 # Tests for get_allowed_characters
 # -------------------------------------------------------------------
@@ -43,20 +35,6 @@ def test_get_allowed_characters_default(ascii_allowed):
 
     # Check that a typical non-ASCII char is excluded
     assert "é" not in ascii_allowed, "Default allowed set should NOT contain 'é'"
-
-
-def test_get_allowed_characters_all_unicode(all_unicode_allowed):
-    """
-    If allow_unicode_bmp=True, the allowed set should contain Basic Multilingual Plane.
-    """
-    # Check that typical ASCII chars are included
-    for ch in "ABC123!@# \t\n\r":
-        assert ch in all_unicode_allowed
-
-    # Check that a typical non-ASCII char is included
-    assert "é" in all_unicode_allowed, "All unicode set should contain 'é'"
-    # Check that an unusual symbol is included
-    assert "𝑇" in all_unicode_allowed, "All unicode set should contain '𝑇'"
 
 
 def test_get_allowed_characters_custom_chars(ascii_allowed):
@@ -279,17 +257,6 @@ def test_sanitize_text_default(text, expected, ascii_allowed):
     assert sanitized == expected, (
         f"Failed text: {text}, " f"Found: {sanitized}, " f"Expected: {expected}"
     )
-
-
-def test_sanitize_text_all_unicode(all_unicode_allowed):
-    """
-    If everything is allowed, sanitize_text should return the original text.
-    """
-    text = "Any unicode text: Café ☯ Ⅵ ﬁ 𝔗"
-    sanitized = sanitize_text(
-        text, allowed_characters=all_unicode_allowed, interactive=False
-    )
-    assert sanitized == text, "When all unicode is allowed, we expect no changes."
 
 
 def test_sanitize_text_no_disallowed_return_same(ascii_allowed):

@@ -18,8 +18,7 @@ Usage examples:
   - sanitext                   # Process the clipboard string, copy to clipboard, print if unchanged
   - sanitext --verbose         # Process + show detected info
   - sanitext --very-verbose    # Process + show input, detected info, and output
-  - sanitext --allow-unicode-bmp   # Allow Unicode characters of the Basic Multilingual Plane
-  - sanitext --allow-chars "αñøç"  # Allow additional characters
+  - sanitext --allow-chars "αñøç"  # Allow additional characters (only single unicode code point)
   - sanitext --allow-file allowed_chars.txt  # Allow characters from a file
   - sanitext --interactive    # Prompt user for handling disallowed characters
 """
@@ -55,11 +54,6 @@ def main(
         "-vv",
         help="Very verbose mode (process + show input, detected info, and output).",
     ),
-    allow_unicode_bmp: bool = typer.Option(
-        False,
-        "--allow-unicode-bmp",
-        help="Allow Unicode characters of the Basic Multilingual Plane.",  # https://symbl.cc/en/unicode/blocks/
-    ),
     allow_chars: str = typer.Option(
         None,
         "--allow-chars",
@@ -91,7 +85,6 @@ def main(
         raise typer.Exit(1)
 
     allowed_characters = get_allowed_characters(
-        allow_unicode_bmp=allow_unicode_bmp,
         allow_chars=allow_chars,
         allow_file=allow_file,
     )
