@@ -3,21 +3,28 @@ import re
 import string
 import sys
 from sanitext.homoglyph_map import get_homoglyph_replacement
+from sanitext.emoji_set import EMOJI_SET
 
 
-def get_allowed_characters(allow_unicode_bmp=False, allow_chars=None, allow_file=None):
+def get_allowed_characters(
+    allow_unicode_bmp=False, allow_emojis=False, allow_chars=None, allow_file=None
+):
     """
     Build and return the set of allowed characters based on:
       - default ASCII printable
       - user-specified flag to allow all bmp unicode
+      - user-specified flag to allow emojis
       - user-specified chars
-      - user-specified file
+      - user-specified file (pathlib.Path object)
     """
     if allow_unicode_bmp:
         # Entire range of Basic Multilingual Plane
         allowed = set(chr(i) for i in range(sys.maxunicode + 1))
     else:
         allowed = set(string.printable)
+
+    if allow_emojis:
+        allowed.update(EMOJI_SET)
 
     # If user provides extra chars via CLI:
     if allow_chars:

@@ -30,7 +30,7 @@ sanitext --string "Héllø, 𝒲𝑜𝓇𝓁𝒹!"
 sanitext --verbose
 # Process + show detected info + show input/output, also --very-verbose
 sanitext -vv
-# Allow Unicode characters (Basic Multilingual Plane, use with caution, it allows many homoglyphs)
+# Allow Unicode characters (Basic Multilingual Plane, use with caution, it allows many homoglyphs and variation selectors)
 sanitext --allow-unicode-bmp
 # Allow additional characters
 sanitext --allow-chars "αøñç"
