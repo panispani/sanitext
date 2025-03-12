@@ -19,25 +19,29 @@ By default, sanitext uses the string in your clipboard unless you specify one wi
 ## CLI usage example
 
 ```bash
-# Process the clipboard string, copy to clipboard, print if unchanged
+# Process the clipboard content & copy back to clipboard
 sanitext
-# Detect characters only
+# Detect characters but don't modify
 sanitext --detect
+# Process clipboard + show detected characters (most common command)
+sanitext -v
+# Process clipboard + show input, detected characters & output
+sanitext -vv
 # Process the provided string and print it
 sanitext --string "Héllø, 𝒲𝑜𝓇𝓁𝒹!"
-# Process + show detected info, also -v
-sanitext --verbose
-# Process + show detected info + show input/output, also --very-verbose
-sanitext -vv
-# Allow additional characters (only single unicode code point)
+# Allow additional characters (for now, only single unicode code point characters)
 sanitext --allow-chars "αøñç"
 # Allow characters from a file
 sanitext --allow-file allowed_chars.txt
+# Allow single code point emoji
+sanitext --allow-emoji
 # Prompt user for handling disallowed characters
 # y (Yes) -> keep it
 # n (No) -> remove it
 # r (Replace) -> provide a replacement character
 sanitext --interactive
+# Allow emojis
+sanitext --allow-emoji
 ```
 
 ## Python library usage example
@@ -49,20 +53,25 @@ from sanitext.text_sanitization import (
     get_allowed_characters,
 )
 
-text = "“2×3 – 4 = 5”"
+text = "“2×3 – 4 = 5”😎󠅒󠅟󠅣󠅣"
 
 # Detect suspicious characters
 suspicious_characters = detect_suspicious_characters(text)
-# [('“', 'LEFT DOUBLE QUOTATION MARK'), ('×', 'MULTIPLICATION SIGN'), ('–', 'EN DASH'), ('”', 'RIGHT DOUBLE QUOTATION MARK')]
 print(f"Suspicious characters: {suspicious_characters}")
+# [('“', 'LEFT DOUBLE QUOTATION MARK'), ('×', 'MULTIPLICATION SIGN'), ('–', 'EN DASH'), ('”', 'RIGHT DOUBLE QUOTATION MARK')]
 
-# Sanitize text
+# Sanitize text to all ASCII
 sanitized_text = sanitize_text(text)
-print(f"Sanitized text: {sanitized_text}")
+print(f"Sanitized text: {sanitized_text}")  # "2x3 - 4 = 5"
+# Allow the multiplication sign
 allowed_characters = get_allowed_characters()
-allowed_characters.add("×") # Allow the multiplication sign
+allowed_characters.add("×")
 sanitized_text = sanitize_text(text, allowed_characters=allowed_characters)
-print(f"Sanitized text: {sanitized_text}")
+print(f"Sanitized text: {sanitized_text}")  # "2×3 - 4 = 5"
+# Allow the emoji (but clean it from the encoded message "boss")
+allowed_characters = get_allowed_characters(allow_emoji=True)
+sanitized_text = sanitize_text(text, allowed_characters=allowed_characters)
+print(f"Sanitized text: {sanitized_text}")  # "2x3 - 4 = 5"😎
 ```
 
 ## Dev setup

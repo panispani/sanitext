@@ -20,7 +20,8 @@ Usage examples:
   - sanitext --very-verbose    # Process + show input, detected info, and output
   - sanitext --allow-chars "αñøç"  # Allow additional characters (only single unicode code point)
   - sanitext --allow-file allowed_chars.txt  # Allow characters from a file
-  - sanitext --interactive    # Prompt user for handling disallowed characters
+  - sanitext --allow-emoji     # Allow single code point emoji
+  - sanitext --interactive     # Prompt user for handling disallowed characters
 """
 
 import pyperclip
