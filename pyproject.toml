@@ -24,3 +24,7 @@ tox = "^4.24.1"
 
 [project.scripts]
 sanitext = "sanitext.cli:app"
+
+[project.urls]
+Article = "https://www.panispani.com/blog/2025/sanitext/"
+Repository = "https://github.com/panispani/sanitext"
